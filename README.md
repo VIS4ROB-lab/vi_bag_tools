@@ -20,6 +20,7 @@ installation
   $ git clone git@github.com:ethz-asl/Schweizer-Messer.git
   
   $ git clone git@github.com:weblucas/vi_bag_tools.git
+  
   $ cd ~/catkin_ws/
   $ catkin build
   $ source devel/setup.bash
