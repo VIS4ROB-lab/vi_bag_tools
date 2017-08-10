@@ -57,6 +57,9 @@ if parsed.image_topics is not None:
       iProgress.reset(numImages)
       iProgress.sample()
 
+      with open( "{0}/cam{1}/sensor.yaml".format(parsed.output_folder, cidx), 'wb') as sensorFile:
+        sensorFile.write("# General sensor definitions.\n sensor_type: camera")
+
       with open( "{0}/cam{1}/{2}".format(parsed.output_folder, cidx, "data.csv"), 'wb') as camDataFile:
         spamwriter = csv.writer(camDataFile, delimiter=',')
         spamwriter.writerow(["#timestamp", "filename"])
@@ -89,6 +92,9 @@ if parsed.imu_topics is not None:
         print "Extracting {0} IMU messages from topic {1}".format(numMsg, dataset.topic)
         iProgress.reset(numMsg)
         iProgress.sample()
+
+        with open( "{0}/imu{1}/sensor.yaml".format(parsed.output_folder, iidx), 'wb') as sensorFile:
+          sensorFile.write("# General sensor definitions.\nsensor_type: imu")
 
         with open( "{0}/{1}".format(parsed.output_folder, filename), 'wb') as imufile:
           spamwriter = csv.writer(imufile, delimiter=',')
