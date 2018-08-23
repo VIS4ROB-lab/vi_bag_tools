@@ -9,6 +9,6 @@
   <buildtool_depend>catkin</buildtool_depend>
   <buildtool_depend>catkin_simple</buildtool_depend>
   
-  <!-- List dependencies to system libs and other catkin packages here. 
-  <build_depend>sm_python</build_depend>-->
+  <!-- List dependencies to system libs and other catkin packages here. -->
+  <build_depend>sm_python</build_depend>
 </package>
