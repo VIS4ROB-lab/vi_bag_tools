@@ -2,7 +2,6 @@
 #print "importing libraries"
 
 import kalibr_common as kc
-import cv
 import cv2
 import csv
 import os
@@ -66,7 +65,7 @@ if parsed.image_topics is not None:
       
         for timestamp, image in dataset:
           params = list()
-          params.append(cv.CV_IMWRITE_PNG_COMPRESSION)
+          params.append(cv2.IMWRITE_PNG_COMPRESSION)
           params.append(0) #0: loss-less  
           timestamp_int = timestamp.toNSec()
           filename = "{0}.png".format(timestamp_int)#TODO unify timestamp conversion with the imu part of the code          
