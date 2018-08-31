@@ -1,14 +1,22 @@
 #!/usr/bin/env python
+#This code is based on the kalibr_bagextractor. We only change the output format.
+#Please read the license in the root of the repository
 
 import kalibr_common as kc
 
-import cv
 import cv2
 import csv
 import os
 import sys
 import argparse
 import sm
+
+
+try:
+    import cv
+    png_flag = cv.CV_IMWRITE_PNG_COMPRESSION
+except ImportError:    
+    png_flag = cv2.IMWRITE_PNG_COMPRESSION
 
 
 
@@ -66,10 +74,10 @@ if parsed.image_topics is not None:
       
         for timestamp, image in dataset:
           params = list()
-          params.append(cv2.IMWRITE_PNG_COMPRESSION)
+          params.append(png_flag)
           params.append(0) #0: loss-less  
           timestamp_int = timestamp.toNSec()
-          filename = "{0}.png".format(timestamp_int)#TODO unify timestamp conversion with the imu part of the code          
+          filename = "{0}.png".format(timestamp_int)
           cv2.imwrite( "{0}/cam{1}/data/{2}".format(parsed.output_folder, cidx, filename), image, params )
 
           spamwriter.writerow([timestamp_int, "data/{0}".format(filename)])
