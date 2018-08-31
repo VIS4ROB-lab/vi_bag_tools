@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-#print "importing libraries"
 
 import kalibr_common as kc
 
+import cv
 import cv2
 import csv
 import os
@@ -10,7 +10,7 @@ import sys
 import argparse
 import sm
 
-#print
+
 
 #setup the argument list
 parser = argparse.ArgumentParser(description='Extract a ROS bag containing a image and imu topics.')
