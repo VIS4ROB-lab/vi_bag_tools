@@ -2,14 +2,15 @@
 #This code is based on the kalibr_bagextractor. We only change the output format.
 #Please read the license in the root of the repository
 
-import kalibr_common as kc
+
 
 import cv2
 import csv
 import os
 import sys
+import numpy_eigen
 import argparse
-import sm
+import vbt
 
 
 try:
@@ -51,12 +52,12 @@ except:
   pass
 
 # prepare progess bar
-iProgress = sm.Progress2(1)
+iProgress = vbt.Progress2(1)
     
 #extract images
 if parsed.image_topics is not None:
     for cidx, topic in enumerate(parsed.image_topics):
-      dataset = kc.BagImageDatasetReader(parsed.bag, topic)
+      dataset = vbt.BagImageDatasetReader(parsed.bag, topic)
       os.makedirs("{0}/cam{1}/data".format(parsed.output_folder, cidx))        
       
       numImages = dataset.numImages()
@@ -76,7 +77,7 @@ if parsed.image_topics is not None:
           params = list()
           params.append(png_flag)
           params.append(0) #0: loss-less  
-          timestamp_int = timestamp.toNSec()
+          timestamp_int = timestamp
           filename = "{0}.png".format(timestamp_int)
           cv2.imwrite( "{0}/cam{1}/data/{2}".format(parsed.output_folder, cidx, filename), image, params )
 
@@ -91,7 +92,7 @@ print
 #extract imu data
 if parsed.imu_topics is not None:
     for iidx, topic in enumerate(parsed.imu_topics):
-        dataset = kc.BagImuDatasetReader(parsed.bag, topic)
+        dataset = vbt.BagImuDatasetReader(parsed.bag, topic)
         os.makedirs("{0}/imu{1}".format(parsed.output_folder, iidx))
         filename = "imu{0}/data.csv".format(iidx)
         
@@ -109,7 +110,7 @@ if parsed.imu_topics is not None:
           spamwriter.writerow(["#timestamp", "omega_x", "omega_y", "omega_z", "alpha_x", "alpha_y", "alpha_z"])
       
           for timestamp, omega, alpha in dataset:
-            timestamp_int = timestamp.toNSec()
+            timestamp_int = timestamp
             spamwriter.writerow([timestamp_int, omega[0],omega[1],omega[2], alpha[0],alpha[1],alpha[2] ])
             iProgress.sample()
           print "\r      done.                                                          "

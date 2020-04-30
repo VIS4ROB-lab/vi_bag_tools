@@ -5,7 +5,7 @@ from catkin_pkg.python_setup import generate_distutils_setup
 
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
-    packages=['vi_bag_tools','kalibr_common'],
+    packages=['vi_bag_tools','vbt'],
     scripts=['python/bagextractor_asl_format'],
     package_dir={'':'python'}
 )
