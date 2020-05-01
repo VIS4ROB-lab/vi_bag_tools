@@ -19,9 +19,10 @@ try:
 except ImportError:    
     png_flag = cv2.IMWRITE_PNG_COMPRESSION
 
-def extract_image_topic(iProgress,bag,topic,cidx,output_folder):
+def extract_image_topic(iProgress,bag,topic,topic_output_folder):
   dataset = vbt.BagImageDatasetReader(bag, topic)
-  os.makedirs("{0}/cam{1}/data".format(output_folder, cidx))        
+  
+  os.makedirs("{0}/data".format(topic_output_folder))        
   
   numImages = dataset.numImages()
   #progress bar
@@ -29,10 +30,10 @@ def extract_image_topic(iProgress,bag,topic,cidx,output_folder):
   iProgress.reset(numImages)
   iProgress.sample()
 
-  with open( "{0}/cam{1}/sensor.yaml".format(output_folder, cidx), 'wb') as sensorFile:
+  with open( "{0}/sensor.yaml".format(topic_output_folder), 'wb') as sensorFile:
     sensorFile.write("# General sensor definitions.\n sensor_type: camera")
 
-  with open( "{0}/cam{1}/{2}".format(output_folder, cidx, "data.csv"), 'wb') as camDataFile:
+  with open( "{0}/data.csv".format(topic_output_folder), 'wb') as camDataFile:
     spamwriter = csv.writer(camDataFile, delimiter=',')
     spamwriter.writerow(["#timestamp", "filename"])
   
@@ -42,7 +43,7 @@ def extract_image_topic(iProgress,bag,topic,cidx,output_folder):
       params.append(0) #0: loss-less  
       timestamp_int = timestamp
       filename = "{0}.png".format(timestamp_int)
-      cv2.imwrite( "{0}/cam{1}/data/{2}".format(output_folder, cidx, filename), image, params )
+      cv2.imwrite( "{0}/data/{1}".format(topic_output_folder, filename), image, params )
 
       spamwriter.writerow([timestamp_int, "data/{0}".format(filename)])
       
@@ -76,72 +77,6 @@ def extract_imu_topic(iProgress,bag,topic,iidx,output_folder):
     print "\r      done.                                                          "
     print
 
-
-
-    
-# #extract images
-# if parsed.image_topics is not None:
-#     for cidx, topic in enumerate(parsed.image_topics):
-#       dataset = vbt.BagImageDatasetReader(parsed.bag, topic)
-#       os.makedirs("{0}/cam{1}/data".format(parsed.output_folder, cidx))        
-      
-#       numImages = dataset.numImages()
-#       #progress bar
-#       print "Extracting {0} images from topic {1}".format(numImages, dataset.topic)
-#       iProgress.reset(numImages)
-#       iProgress.sample()
-
-#       with open( "{0}/cam{1}/sensor.yaml".format(parsed.output_folder, cidx), 'wb') as sensorFile:
-#         sensorFile.write("# General sensor definitions.\n sensor_type: camera")
-
-#       with open( "{0}/cam{1}/{2}".format(parsed.output_folder, cidx, "data.csv"), 'wb') as camDataFile:
-#         spamwriter = csv.writer(camDataFile, delimiter=',')
-#         spamwriter.writerow(["#timestamp", "filename"])
-      
-#         for timestamp, image in dataset:
-#           params = list()
-#           params.append(png_flag)
-#           params.append(0) #0: loss-less  
-#           timestamp_int = timestamp
-#           filename = "{0}.png".format(timestamp_int)
-#           cv2.imwrite( "{0}/cam{1}/data/{2}".format(parsed.output_folder, cidx, filename), image, params )
-
-#           spamwriter.writerow([timestamp_int, "data/{0}".format(filename)])
-          
-#           iProgress.sample()
-        
-#         print "\r      done.                                                          "
-#         print
-# print
-
-# #extract imu data
-# if parsed.imu_topics is not None:
-#     for iidx, topic in enumerate(parsed.imu_topics):
-#         dataset = vbt.BagImuDatasetReader(parsed.bag, topic)
-#         os.makedirs("{0}/imu{1}".format(parsed.output_folder, iidx))
-#         filename = "imu{0}/data.csv".format(iidx)
-        
-#         #progress bar
-#         numMsg = dataset.numMessages()
-#         print "Extracting {0} IMU messages from topic {1}".format(numMsg, dataset.topic)
-#         iProgress.reset(numMsg)
-#         iProgress.sample()
-
-#         with open( "{0}/imu{1}/sensor.yaml".format(parsed.output_folder, iidx), 'wb') as sensorFile:
-#           sensorFile.write("# General sensor definitions.\nsensor_type: imu")
-
-#         with open( "{0}/{1}".format(parsed.output_folder, filename), 'wb') as imufile:
-#           spamwriter = csv.writer(imufile, delimiter=',')
-#           spamwriter.writerow(["#timestamp", "omega_x", "omega_y", "omega_z", "alpha_x", "alpha_y", "alpha_z"])
-      
-#           for timestamp, omega, alpha in dataset:
-#             timestamp_int = timestamp
-#             spamwriter.writerow([timestamp_int, omega[0],omega[1],omega[2], alpha[0],alpha[1],alpha[2] ])
-#             iProgress.sample()
-#           print "\r      done.                                                          "
-#           print
-
-
 def main():
   #setup the argument list
   parser = argparse.ArgumentParser(description='Extract a ROS bag containing a image and imu topics.')
@@ -159,8 +94,8 @@ def main():
   #parse the args
   parsed = parser.parse_args()
 
-  if parsed.image_topics is None and parsed.imu_topics is None:
-      print "ERROR: Need at least one camera or IMU topic."
+  if parsed.semantic_topics is None and parsed.image_topics is None and parsed.imu_topics is None:
+      print "ERROR: no topic provided."
       sys.exit(-1)
 
   #create output folder
@@ -181,11 +116,17 @@ def main():
     for iidx, topic in enumerate(parsed.imu_topics):
       extract_imu_topic(iProgress,parsed.bag,topic,iidx,parsed.output_folder)
 
-  print
-
   if parsed.image_topics is not None:
+    print
     for cidx, topic in enumerate(parsed.image_topics):
-      extract_image_topic(iProgress,parsed.bag,topic,cidx,parsed.output_folder)
+      topic_output_folder = "{0}/cam{1}".format(parsed.output_folder, cidx)
+      extract_image_topic(iProgress,parsed.bag,topic,topic_output_folder)
+
+  if parsed.semantic_topics is not None:
+    print
+    for sidx, topic in enumerate(parsed.semantic_topics):
+      topic_output_folder = "{0}/semantic{1}".format(parsed.output_folder, sidx)
+      extract_image_topic(iProgress,parsed.bag,topic,topic_output_folder)
 
 
   
