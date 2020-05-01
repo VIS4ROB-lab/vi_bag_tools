@@ -16,9 +16,14 @@ installation
   $ cd ~/catkin_ws/src
   $ git clone git@github.com:catkin/catkin_simple
   $ git clone git@github.com:ethz-asl/eigen_catkin
+  
+  # If you don't need Schweizer-Messer package you can donwload only then numpy_eigen package and catkin_boost_python_buildtool
   $ git clone git@github.com:ethz-asl/catkin_boost_python_buildtool
   $ git clone git@github.com:ethz-asl/numpy_eigen.git
+  OR
+  $git clone git@github.com:ethz-asl/Schweizer-Messer.git
   
+  #This package
   $ git clone git@github.com:VIS4ROB-lab/vi_bag_tools.git
   
   $ cd ~/catkin_ws/
