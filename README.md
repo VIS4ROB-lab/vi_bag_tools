@@ -1,7 +1,6 @@
 vi_bag_tools
 =================
-Subset of bagfiles tools from Kalibr (https://github.com/ethz-asl/kalibr) with small modifications on the output format.
-This package cannot be in the same catkin workspace than Kalibr.
+Software for extracting imu measuraments and images from bagfile. It is a extract from Kalibr (https://github.com/ethz-asl/kalibr) with small modifications on the output format and to eliminate dependences.
 
 installation
 -------------------
@@ -15,10 +14,10 @@ installation
 * Get the tool set and dependencies
 ```sh
   $ cd ~/catkin_ws/src
-  $ sudo apt-get install liblapacke-dev
   $ git clone git@github.com:catkin/catkin_simple
   $ git clone git@github.com:ethz-asl/eigen_catkin
-  $ git clone git@github.com:ethz-asl/Schweizer-Messer.git
+  $ git clone git@github.com:ethz-asl/catkin_boost_python_buildtool
+  $ git clone git@github.com:ethz-asl/numpy_eigen.git
   
   $ git clone git@github.com:VIS4ROB-lab/vi_bag_tools.git
   
@@ -33,7 +32,7 @@ How to run
 example:
 
 ``
-bagextractor_asl_format --image-topics /cam0/image_raw /cam1/image_raw --imu-topics /imu0  --bag /home/lucas/data/bags/uzh/2016-06-22-17-10-05.bag --output-folder /home/lucas/data/bags/outputdir4
+bagextractor_asl_format --image-topics /cam0/image_raw /cam1/image_raw --imu-topics /imu0  --bag /home/lucas/data/bags/euroc/MH_05_difficult.bag --output-folder /home/lucas/data/output_dir
 ``
 
 
@@ -41,9 +40,12 @@ License
 -------------------
 Copyright (c) 2014, Paul Furgale, Jérôme Maye and Jörn Rehder, Autonomous Systems Lab, 
                     ETH Zurich, Switzerland
+
 Copyright (c) 2014, Thomas Schneider, Skybotix AG, Switzerland
-Copyright (c) 2018, Lucas Teixeira, Vision for Robotics Lab, 
+
+Copyright (c) 2018-2020, Lucas Teixeira, Vision for Robotics Lab, 
                     ETH Zurich, Switzerland
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
