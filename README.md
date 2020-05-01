@@ -1,6 +1,6 @@
 vi_bag_tools
 =================
-Software for extracting imu measuraments and images from bagfile. It is a extract from Kalibr (https://github.com/ethz-asl/kalibr) with small modifications on the output format and to eliminate dependences.
+Software for extracting imu measurements and images from bagfile. It is a extract from Kalibr (https://github.com/ethz-asl/kalibr) with small modifications on the output format and to eliminate dependences.
 
 installation
 -------------------
