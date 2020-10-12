@@ -11,6 +11,8 @@ import sys
 import numpy_eigen
 import argparse
 import vbt
+import OpenEXR
+import Imath
 
 
 try:
@@ -52,6 +54,41 @@ def extract_image_topic(iProgress,bag,topic,topic_output_folder):
     print "\r      done.                                                          "
     print
 
+
+def extract_depth_map_topic(iProgress,bag,topic,topic_output_folder):
+  dataset = vbt.BagImageDatasetReader(bag, topic)
+  
+  os.makedirs("{0}/data".format(topic_output_folder))        
+  
+  numImages = dataset.numImages()
+  #progress bar
+  print "Extracting {0} images from topic {1}".format(numImages, dataset.topic)
+  iProgress.reset(numImages)
+  iProgress.sample()
+
+  with open( "{0}/sensor.yaml".format(topic_output_folder), 'wb') as sensorFile:
+    sensorFile.write("# General sensor definitions.\n sensor_type: depth camera")
+
+  with open( "{0}/data.csv".format(topic_output_folder), 'wb') as camDataFile:
+    spamwriter = csv.writer(camDataFile, delimiter=',')
+    spamwriter.writerow(["#timestamp", "filename"])
+  
+    for timestamp, image in dataset:
+      timestamp_int = timestamp
+      filename = "{0}.exr".format(timestamp_int)
+      exr_header = OpenEXR.Header(image.shape[1], image.shape[0])
+      exr_header['channels'] = {'Z': Imath.Channel(Imath.PixelType(Imath.PixelType.FLOAT))} 
+      exr = OpenEXR.OutputFile("{0}/data/{1}".format(topic_output_folder, filename), exr_header)
+      exr.writePixels({'Z': image.tostring()})
+
+      spamwriter.writerow([timestamp_int, "data/{0}".format(filename)])
+      
+      iProgress.sample()
+    
+    print "\r      done.                                                          "
+    print
+
+
 def extract_imu_topic(iProgress,bag,topic,iidx,output_folder):
   dataset = vbt.BagImuDatasetReader(bag, topic)
   os.makedirs("{0}/imu{1}".format(output_folder, iidx))
@@ -77,6 +114,33 @@ def extract_imu_topic(iProgress,bag,topic,iidx,output_folder):
     print "\r      done.                                                          "
     print
 
+
+def extract_gt_odometry_topic(iProgress,bag,topic,oidx,output_folder):
+  dataset = vbt.BagOdometryDatasetReader(bag, topic)
+  os.makedirs("{0}/gt_odometry{1}".format(output_folder, oidx))
+  filename = "gt_odometry{0}/data.csv".format(oidx)
+  
+  #progress bar
+  numMsg = dataset.numMessages()
+  print "Extracting {0} ground-truth odometry messages from topic {1}".format(numMsg, dataset.topic)
+  iProgress.reset(numMsg)
+  iProgress.sample()
+
+  with open( "{0}/gt_odometry{1}/sensor.yaml".format(output_folder, oidx), 'wb') as sensorFile:
+    sensorFile.write("# General sensor definitions.\nsensor_type: odometry")
+
+  with open( "{0}/{1}".format(output_folder, filename), 'wb') as odometryfile:
+    spamwriter = csv.writer(odometryfile, delimiter=',')
+    spamwriter.writerow(["#time", "field.header.seq", "field.header.stamp", "field.header.frame_id", "field.pose.position.x", "field.pose.position.y", "field.pose.position.z", "field.pose.orientation.x", "field.pose.orientation.y", "field.pose.orientation.z", "field.pose.orientation.w"])
+
+    for time, seq, timestamp, frame_id, position, orientation in dataset:
+      timestamp_int = timestamp
+      spamwriter.writerow([time, seq, timestamp_int, frame_id, position[0], position[1], position[2], orientation[0], orientation[1], orientation[2], orientation[3] ])
+      iProgress.sample()
+    print "\r      done.                                                          "
+    print
+
+
 def main():
   #setup the argument list
   parser = argparse.ArgumentParser(description='Extract a ROS bag containing a image and imu topics.')
@@ -84,6 +148,8 @@ def main():
   parser.add_argument('--image-topics',  metavar='image_topics', nargs='*', help='Image topics %(default)s')
   parser.add_argument('--semantic-topics',  metavar='semantic_topics', nargs='*', help='Semantic Map topics %(default)s')
   parser.add_argument('--imu-topics',  metavar='imu_topics', nargs='*', help='Imu topics %(default)s')
+  parser.add_argument('--gt_odometry_topics', metavar='gt_odometry_topics', nargs='*', help='GT odometry topics %(default)s')
+  parser.add_argument('--depth_map_topics', metavar='depth_map_topics', nargs='*', help='Depth Map topics %(default)s')
   parser.add_argument('--output-folder',  metavar='output_folder', nargs='?', default="output", help='Output folder %(default)s')
 
   #print help if no argument is specified
@@ -94,7 +160,7 @@ def main():
   #parse the args
   parsed = parser.parse_args()
 
-  if parsed.semantic_topics is None and parsed.image_topics is None and parsed.imu_topics is None:
+  if parsed.semantic_topics is None and parsed.image_topics is None and parsed.imu_topics is None and parsed.depth_map_topics is None and parsed.gt_odometry_topics is None:
       print "ERROR: no topic provided."
       sys.exit(-1)
 
@@ -128,6 +194,15 @@ def main():
       topic_output_folder = "{0}/semantic{1}".format(parsed.output_folder, sidx)
       extract_image_topic(iProgress,parsed.bag,topic,topic_output_folder)
 
+  if parsed.depth_map_topics is not None:
+    print
+    for didx, topic in enumerate(parsed.depth_map_topics):
+      topic_output_folder = "{0}/depth{1}".format(parsed.output_folder, didx)
+      extract_depth_map_topic(iProgress,parsed.bag,topic,topic_output_folder)
+
+  if parsed.gt_odometry_topics is not None:
+    for oidx, topic in enumerate(parsed.gt_odometry_topics):
+      extract_gt_odometry_topic(iProgress,parsed.bag,topic,oidx,parsed.output_folder)
 
   
 main()
