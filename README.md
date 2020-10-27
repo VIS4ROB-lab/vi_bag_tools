@@ -34,10 +34,15 @@ installation
 
 How to run
 -------------------
-example:
+examples:
+
 
 ``
-bagextractor_asl_format --image-topics /cam0/image_raw /cam1/image_raw --semantic-topics /cam0/semantic_map --imu-topics /imu0  --bag /home/lucas/data/bags/euroc/MH_05_difficult.bag --output-folder /home/lucas/data/output_dir
+bagextractor_asl_format --image-topics /cam0/image_raw /cam1/image_raw --imu-topics /imu0  --bag /home/lucas/data/bags/euroc/MH_05_difficult.bag --output-folder /home/lucas/data/output_dir
+``
+
+``
+bagextractor_asl_format --image-topics /firefly/vrglasses_for_robots_ros/color_map --depth_map_topics /firefly/vrglasses_for_robots_ros/depth_map --semantic-topics /firefly/vrglasses_for_robots_ros/semantic_map --gt_odometry_topics /firefly/vi_sensor/ground_truth/odometry /firefly/vrglasses_for_robots_ros/camera_odometry_out --bag /media/2020-10-27-18-43-43.bag --output-folder /home/lucas/data/output_dir
 ``
 
 
@@ -48,7 +53,7 @@ Copyright (c) 2014, Paul Furgale, Jérôme Maye and Jörn Rehder, Autonomous Sys
 
 Copyright (c) 2014, Thomas Schneider, Skybotix AG, Switzerland
 
-Copyright (c) 2018-2020, Lucas Teixeira, Vision for Robotics Lab, 
+Copyright (c) 2018-2020, Lucas Teixeira, Fabiola Maffra, Vision for Robotics Lab, 
                     ETH Zurich, Switzerland
 
 All rights reserved.
